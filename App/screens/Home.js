@@ -10,12 +10,12 @@ import {
   Keyboard,
   SafeAreaView,
 } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { Entypo } from '@expo/vector-icons';
 import Button from '../components/Button';
 import { ConversionInput } from '../components/ConversionInput';
 import colors from '../constants/colors';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const screen = Dimensions.get('window');
 
@@ -59,9 +59,19 @@ const styles = StyleSheet.create({
 });
 
 const Home = ({ navigation }) => {
-  const baseCurrency = 'USD';
-  const quoteCurrency = 'GBP';
+  // const baseCurrency = 'USD';
+  // const quoteCurrency = 'GBP';
+  const [baseCurrency, setBaseCurrency] = useState('USD');
+  const [quoteCurrency, setQuoteCurrency] = useState('GBP');
+  const [value, setValue] = useState('100');
+
   const conversionRate = 0.8345;
+
+  const swapCurrencies = () => {
+    setBaseCurrency(quoteCurrency);
+    setQuoteCurrency(baseCurrency);
+  };
+
   const date = new Date();
 
   const [scrollEnabled, setScrollEnabled] = useState(false);
@@ -105,22 +115,34 @@ const Home = ({ navigation }) => {
           <Text style={styles.textHeader}>Currency Converter</Text>
           <ConversionInput
             text={baseCurrency}
-            value='123'
-            onButtonPress={() => alert('convert!')}
-            onChangeText={(text) => console.log('text', text)}
+            value={value}
+            onButtonPress={() =>
+              navigation.push('CurrencyList', {
+                title: 'Base Currency',
+                activeCurrency: baseCurrency,
+              })
+            }
+            onChangeText={(text) => setValue(text)}
             keyboardType='numeric'
           />
           <ConversionInput
             text={quoteCurrency}
-            value='123'
-            onButtonPress={() => alert('convert!')}
+            value={
+              value && `${(parseFloat(value) * conversionRate).toFixed(2)}`
+            }
+            onButtonPress={() =>
+              navigation.push('CurrencyList', {
+                title: 'Quote Currency',
+                activeCurrency: quoteCurrency,
+              })
+            }
             editable={false}
           />
           <Text style={styles.text}>
             {`1 ${baseCurrency} = ${conversionRate} ${quoteCurrency} as of ${date.toDateString()}`}
           </Text>
 
-          <Button text='Reverse Currencies' onPress={() => alert('todo!')} />
+          <Button text='Reverse Currencies' onPress={() => swapCurrencies()} />
         </View>
       </ScrollView>
     </View>
